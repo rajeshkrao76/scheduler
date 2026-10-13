@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>RaveOne Interview Scheduler</title>
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">
+    <strong>RaveOne</strong><span>Scheduler</span>
+  </div>
+  <nav id="nav"></nav>
+</header>
+
+<main id="app">
+  <section id="view-loading" class="view">
+    <div class="spinner"></div>
+    <p>Loading…</p>
+  </section>
+
+  <!-- ADMIN LOGIN -->
+  <section id="view-admin-login" class="view hidden">
+    <h2>Admin Login</h2>
+    <form id="admin-login-form">
+      <input type="password" id="admin-password" placeholder="Admin password" required />
+      <button type="submit">Sign in</button>
+    </form>
+    <p class="muted" id="admin-login-error"></p>
+  </section>
+
+  <!-- ADMIN DASHBOARD -->
+  <section id="view-admin" class="view hidden">
+    <h2>Admin Dashboard</h2>
+    <div id="admin-totals" class="cards"></div>
+
+    <div class="tabs">
+      <button data-tab="clients" class="tab active">Clients</button>
+      <button data-tab="candidates" class="tab">Candidates</button>
+      <button data-tab="availability" class="tab">Availability</button>
+      <button data-tab="bookings" class="tab">Bookings</button>
+      <button data-tab="config" class="tab">Config</button>
+    </div>
+
+    <div id="tab-clients" class="tab-panel">
+      <form id="add-client-form" class="inline-form">
+        <input name="company_name" placeholder="Company" required />
+        <input name="contact_name" placeholder="Contact name" />
+        <input name="email" type="email" placeholder="Email" required />
+        <input name="daily_cap" type="number" min="1" max="20" value="4" />
+        <button type="submit">Add client</button>
+      </form>
+      <table id="clients-table"></table>
+    </div>
+
+    <div id="tab-candidates" class="tab-panel hidden">
+      <form id="add-candidate-form" class="inline-form">
+        <select name="client_id" id="cand-client-select" required></select>
+        <input name="name" placeholder="Candidate name" required />
+        <input name="email" type="email" placeholder="Email" required />
+        <input name="phone" placeholder="Phone" />
+        <input name="role" placeholder="Role" />
+        <button type="submit">Add candidate</button>
+      </form>
+      <table id="candidates-table"></table>
+    </div>
+
+    <div id="tab-availability" class="tab-panel hidden">
+      <form id="add-availability-form" class="inline-form">
+        <select name="client_id" id="avail-client-select" required></select>
+        <input type="date" name="date" required />
+        <input type="time" name="start_time" required />
+        <input type="time" name="end_time" required />
+        <button type="submit">Add slots</button>
+      </form>
+      <table id="availability-table"></table>
+    </div>
+
+    <div id="tab-bookings" class="tab-panel hidden">
+      <div class="row">
+        <button id="export-csv">Export CSV</button>
+        <button id="refresh-bookings">Refresh</button>
+        <button id="send-reminders">Send reminders now</button>
+      </div>
+      <table id="bookings-table"></table>
+    </div>
+
+    <div id="tab-config" class="tab-panel hidden">
+      <form id="config-form" class="inline-form">
+        <label>Default daily cap <input type="number" id="cfg-cap" /></label>
+        <label>Slot duration (min) <input type="number" id="cfg-slot" /></label>
+        <label>Company name <input type="text" id="cfg-company" /></label>
+        <label>Company URL <input type="text" id="cfg-url" /></label>
+        <button type="submit">Save config</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- CLIENT VIEW -->
+  <section id="view-client" class="view hidden">
+    <h2 id="client-title">Client Portal</h2>
+    <div class="tabs">
+      <button data-ctab="availability" class="ctab active">My Availability</button>
+      <button data-ctab="candidates" class="ctab">My Candidates</button>
+      <button data-ctab="bookings" class="ctab">Bookings</button>
+    </div>
+
+    <div id="ctab-availability" class="tab-panel">
+      <form id="client-avail-form" class="inline-form">
+        <input type="date" name="date" required />
+        <input type="time" name="start_time" required />
+        <input type="time" name="end_time" required />
+        <button type="submit">Add slots</button>
+      </form>
+      <table id="client-avail-table"></table>
+    </div>
+
+    <div id="ctab-candidates" class="tab-panel hidden">
+      <form id="client-cand-form" class="inline-form">
+        <input name="name" placeholder="Candidate name" required />
+        <input name="email" type="email" placeholder="Email" required />
+        <input name="phone" placeholder="Phone" />
+        <input name="role" placeholder="Role" />
+        <button type="submit">Add candidate</button>
+      </form>
+      <table id="client-cand-table"></table>
+    </div>
+
+    <div id="ctab-bookings" class="tab-panel hidden">
+      <table id="client-bookings-table"></table>
+    </div>
+  </section>
+
+  <!-- CANDIDATE VIEW -->
+  <section id="view-candidate" class="view hidden">
+    <h2>Schedule Your Interview</h2>
+    <p id="candidate-info" class="muted"></p>
+    <div id="candidate-slots" class="slots"></div>
+    <div id="candidate-message" class="message hidden"></div>
+  </section>
+</main>
+
+<footer class="footer">
+  <span>© <span id="year"></span> RaveOne · <a href="https://www.raveone.in" target="_blank">raveone.in</a></span>
+</footer>
+
+<script src="js/app.js"></script>
+</body>
+</html>
