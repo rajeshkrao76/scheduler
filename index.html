@@ -7,142 +7,245 @@
 <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
+<div id="toast-stack"></div>
+
 <header class="topbar">
   <div class="brand">
-    <strong>RaveOne</strong><span>Scheduler</span>
+    <span class="logo">R</span>
+    <div>
+      <strong>RaveOne</strong>
+      <span class="sub">Scheduler</span>
+    </div>
   </div>
+  <div class="tz-pill">🇮🇳 IST (GMT+5:30)</div>
   <nav id="nav"></nav>
 </header>
 
 <main id="app">
-  <section id="view-loading" class="view">
-    <div class="spinner"></div>
-    <p>Loading…</p>
-  </section>
 
   <!-- ADMIN LOGIN -->
   <section id="view-admin-login" class="view hidden">
-    <h2>Admin Login</h2>
-    <form id="admin-login-form">
-      <input type="password" id="admin-password" placeholder="Admin password" required />
-      <button type="submit">Sign in</button>
-    </form>
-    <p class="muted" id="admin-login-error"></p>
+    <div class="login-card">
+      <h2>Admin Sign In</h2>
+      <p class="muted">Enter your admin password to continue.</p>
+      <form id="admin-login-form">
+        <input type="password" id="admin-password" placeholder="Password" autocomplete="current-password" required />
+        <button type="submit" class="btn-primary">Sign in →</button>
+      </form>
+      <p class="err" id="admin-login-error"></p>
+    </div>
   </section>
 
   <!-- ADMIN DASHBOARD -->
   <section id="view-admin" class="view hidden">
-    <h2>Admin Dashboard</h2>
+    <div class="page-head">
+      <h2>Dashboard</h2>
+      <span class="muted" id="today-label"></span>
+    </div>
     <div id="admin-totals" class="cards"></div>
 
     <div class="tabs">
-      <button data-tab="clients" class="tab active">Clients</button>
-      <button data-tab="candidates" class="tab">Candidates</button>
-      <button data-tab="availability" class="tab">Availability</button>
-      <button data-tab="bookings" class="tab">Bookings</button>
-      <button data-tab="config" class="tab">Config</button>
+      <button data-tab="clients" class="tab active">👥 Clients</button>
+      <button data-tab="candidates" class="tab">🧑‍💼 Candidates</button>
+      <button data-tab="availability" class="tab">🗓 Availability</button>
+      <button data-tab="bookings" class="tab">📋 Bookings</button>
     </div>
 
+    <!-- CLIENTS -->
     <div id="tab-clients" class="tab-panel">
-      <form id="add-client-form" class="inline-form">
-        <input name="company_name" placeholder="Company" required />
-        <input name="contact_name" placeholder="Contact name" />
-        <input name="email" type="email" placeholder="Email" required />
-        <input name="daily_cap" type="number" min="1" max="20" value="4" />
-        <button type="submit">Add client</button>
-      </form>
-      <table id="clients-table"></table>
+      <div class="row">
+        <button class="btn-primary" id="open-add-client">+ Add Client</button>
+        <input type="search" id="client-search" placeholder="Search clients…" class="search" />
+      </div>
+      <div id="clients-list" class="list"></div>
     </div>
 
+    <!-- CANDIDATES -->
     <div id="tab-candidates" class="tab-panel hidden">
-      <form id="add-candidate-form" class="inline-form">
-        <select name="client_id" id="cand-client-select" required></select>
-        <input name="name" placeholder="Candidate name" required />
-        <input name="email" type="email" placeholder="Email" required />
-        <input name="phone" placeholder="Phone" />
-        <input name="role" placeholder="Role" />
-        <button type="submit">Add candidate</button>
-      </form>
-      <table id="candidates-table"></table>
+      <div class="row">
+        <select id="cand-client-filter"></select>
+        <button class="btn-primary" id="open-add-cand">+ Add Candidate</button>
+        <button class="btn-ghost" id="open-bulk-cand">📥 Bulk Add</button>
+        <input type="search" id="cand-search" placeholder="Search candidates…" class="search" />
+      </div>
+      <div id="candidates-list" class="list"></div>
     </div>
 
+    <!-- AVAILABILITY -->
     <div id="tab-availability" class="tab-panel hidden">
-      <form id="add-availability-form" class="inline-form">
-        <select name="client_id" id="avail-client-select" required></select>
-        <input type="date" name="date" required />
-        <input type="time" name="start_time" required />
-        <input type="time" name="end_time" required />
-        <button type="submit">Add slots</button>
-      </form>
-      <table id="availability-table"></table>
+      <div class="row">
+        <select id="avail-client-select"></select>
+        <button class="btn-primary" id="open-avail">+ Add Slots</button>
+      </div>
+      <div id="availability-list" class="list"></div>
     </div>
 
+    <!-- BOOKINGS -->
     <div id="tab-bookings" class="tab-panel hidden">
       <div class="row">
-        <button id="export-csv">Export CSV</button>
-        <button id="refresh-bookings">Refresh</button>
-        <button id="send-reminders">Send reminders now</button>
+        <input type="date" id="bookings-date-filter" />
+        <button class="btn-ghost" id="clear-date">Clear</button>
+        <button class="btn-ghost" id="export-csv">⬇ Export CSV</button>
+        <button class="btn-ghost" id="send-reminders">🔔 Send Reminders</button>
+        <button class="btn-ghost" id="refresh-bookings">↻ Refresh</button>
       </div>
-      <table id="bookings-table"></table>
-    </div>
-
-    <div id="tab-config" class="tab-panel hidden">
-      <form id="config-form" class="inline-form">
-        <label>Default daily cap <input type="number" id="cfg-cap" /></label>
-        <label>Slot duration (min) <input type="number" id="cfg-slot" /></label>
-        <label>Company name <input type="text" id="cfg-company" /></label>
-        <label>Company URL <input type="text" id="cfg-url" /></label>
-        <button type="submit">Save config</button>
-      </form>
+      <div id="bookings-list" class="list"></div>
     </div>
   </section>
 
   <!-- CLIENT VIEW -->
   <section id="view-client" class="view hidden">
-    <h2 id="client-title">Client Portal</h2>
+    <div class="page-head">
+      <h2 id="client-title">Client Portal</h2>
+      <span class="tz-pill small">🇮🇳 IST</span>
+    </div>
     <div class="tabs">
-      <button data-ctab="availability" class="ctab active">My Availability</button>
-      <button data-ctab="candidates" class="ctab">My Candidates</button>
-      <button data-ctab="bookings" class="ctab">Bookings</button>
+      <button data-ctab="availability" class="ctab active">🗓 My Availability</button>
+      <button data-ctab="candidates" class="ctab">🧑‍💼 Candidates</button>
+      <button data-ctab="bookings" class="ctab">📋 Bookings</button>
     </div>
 
     <div id="ctab-availability" class="tab-panel">
-      <form id="client-avail-form" class="inline-form">
-        <input type="date" name="date" required />
-        <input type="time" name="start_time" required />
-        <input type="time" name="end_time" required />
-        <button type="submit">Add slots</button>
-      </form>
-      <table id="client-avail-table"></table>
+      <div class="row">
+        <button class="btn-primary" id="client-open-avail">+ Add Slots</button>
+      </div>
+      <div id="client-avail-list" class="list"></div>
     </div>
 
     <div id="ctab-candidates" class="tab-panel hidden">
-      <form id="client-cand-form" class="inline-form">
-        <input name="name" placeholder="Candidate name" required />
-        <input name="email" type="email" placeholder="Email" required />
-        <input name="phone" placeholder="Phone" />
-        <input name="role" placeholder="Role" />
-        <button type="submit">Add candidate</button>
-      </form>
-      <table id="client-cand-table"></table>
+      <div class="row">
+        <button class="btn-primary" id="client-open-cand">+ Add Candidate</button>
+        <button class="btn-ghost" id="client-open-bulk">📥 Bulk Add</button>
+      </div>
+      <div id="client-cand-list" class="list"></div>
     </div>
 
     <div id="ctab-bookings" class="tab-panel hidden">
-      <table id="client-bookings-table"></table>
+      <div id="client-bookings-list" class="list"></div>
     </div>
   </section>
 
   <!-- CANDIDATE VIEW -->
   <section id="view-candidate" class="view hidden">
-    <h2>Schedule Your Interview</h2>
+    <div class="page-head">
+      <h2>Schedule Your Interview</h2>
+      <span class="tz-pill small">🇮🇳 All times in IST</span>
+    </div>
     <p id="candidate-info" class="muted"></p>
     <div id="candidate-slots" class="slots"></div>
     <div id="candidate-message" class="message hidden"></div>
   </section>
+
 </main>
 
+<!-- ============ MODALS ============ -->
+
+<!-- Add Client -->
+<div id="modal-client" class="modal hidden">
+  <div class="modal-card">
+    <div class="modal-head"><h3>Add Client</h3><button class="close" data-close>×</button></div>
+    <form id="modal-client-form">
+      <label>Company name *<input name="company_name" required /></label>
+      <label>Contact person<input name="contact_name" /></label>
+      <label>Email *<input name="email" type="email" required /></label>
+      <label>Daily interview cap<input name="daily_cap" type="number" min="1" max="20" value="4" /></label>
+      <div class="modal-actions">
+        <button type="button" class="btn-ghost" data-close>Cancel</button>
+        <button type="submit" class="btn-primary">Save Client</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Add Candidate -->
+<div id="modal-cand" class="modal hidden">
+  <div class="modal-card">
+    <div class="modal-head"><h3>Add Candidate</h3><button class="close" data-close>×</button></div>
+    <form id="modal-cand-form">
+      <label>Client *<select name="client_id" id="modal-cand-client" required></select></label>
+      <label>Full name *<input name="name" required /></label>
+      <label>Email *<input name="email" type="email" required /></label>
+      <label>Phone<input name="phone" /></label>
+      <label>Role / Position<input name="role" /></label>
+      <div class="modal-actions">
+        <button type="button" class="btn-ghost" data-close>Cancel</button>
+        <button type="submit" class="btn-primary">Save Candidate</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Bulk Add Candidates -->
+<div id="modal-bulk" class="modal hidden">
+  <div class="modal-card wide">
+    <div class="modal-head"><h3>Bulk Add Candidates</h3><button class="close" data-close>×</button></div>
+    <p class="muted small">Paste one candidate per line:<br>
+      <code>Name, email, phone, role</code> — only Name and Email required.</p>
+    <form id="modal-bulk-form">
+      <label>Client *<select name="client_id" id="modal-bulk-client" required></select></label>
+      <textarea name="lines" rows="10" placeholder="Rahul Verma, rahul@example.com, +919876543210, Backend Engineer
+Priya Singh, priya@example.com, Backend Engineer"></textarea>
+      <div id="bulk-result" class="bulk-result hidden"></div>
+      <div class="modal-actions">
+        <button type="button" class="btn-ghost" data-close>Cancel</button>
+        <button type="submit" class="btn-primary">Import Candidates</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Add Availability (with quick pickers + multi-date) -->
+<div id="modal-avail" class="modal hidden">
+  <div class="modal-card wide">
+    <div class="modal-head"><h3>Add Availability</h3><button class="close" data-close>×</button></div>
+    <form id="modal-avail-form">
+      <label>Client *<select name="client_id" id="modal-avail-client" required></select></label>
+
+      <div class="section">
+        <div class="section-title">Quick dates</div>
+        <div class="chip-row" id="quick-dates">
+          <button type="button" class="chip" data-quick="today">Today</button>
+          <button type="button" class="chip" data-quick="tomorrow">Tomorrow</button>
+          <button type="button" class="chip" data-quick="next_mon">Next Monday</button>
+          <button type="button" class="chip" data-quick="next_week">+7 days</button>
+        </div>
+        <div class="grid-2">
+          <label>From date *<input type="date" name="from_date" id="avail-from" required /></label>
+          <label>To date (optional)<input type="date" name="to_date" id="avail-to" /></label>
+        </div>
+        <label class="check"><input type="checkbox" id="skip-weekends" checked /> Skip weekends (Sat/Sun)</label>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Quick time ranges</div>
+        <div class="chip-row" id="quick-times">
+          <button type="button" class="chip" data-start="10:00" data-end="13:00">Morning 10–1</button>
+          <button type="button" class="chip" data-start="14:00" data-end="18:00">Afternoon 2–6</button>
+          <button type="button" class="chip" data-start="10:00" data-end="18:00">Full day 10–6</button>
+          <button type="button" class="chip" data-start="10:00" data-end="14:00">10–2</button>
+          <button type="button" class="chip" data-start="15:00" data-end="18:00">3–6</button>
+        </div>
+        <div class="grid-2">
+          <label>Start time *<input type="time" name="start_time" id="avail-start" value="10:00" required /></label>
+          <label>End time *<input type="time" name="end_time" id="avail-end" value="18:00" required /></label>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Preview</div>
+        <div id="avail-preview" class="preview"></div>
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="btn-ghost" data-close>Cancel</button>
+        <button type="submit" class="btn-primary">Create Slots</button>
+      </div>
+    </form>
+  </div>
+</div>
+
 <footer class="footer">
-  <span>© <span id="year"></span> RaveOne · <a href="https://www.raveone.in" target="_blank">raveone.in</a></span>
+  <span>© <span id="year"></span> RaveOne · <a href="https://www.raveone.in" target="_blank">raveone.in</a> · All times IST</span>
 </footer>
 
 <script src="js/app.js"></script>
