@@ -1,7 +1,7 @@
 /*******************************************************
  * RaveOne Interview Scheduler - Frontend
  *******************************************************/
-const GAS_URL = 'PASTE_YOUR_WEB_APP_EXEC_URL_HERE';
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbwO6BLEnMsMw-YOJxL3KyAnFaN1jFVE5lQvgfghbcCjvgkSVD4wlJ3SPz85UHGgWu9FKQ/exec';
 const ADMIN_KEY = 'raveone_admin_token';
 
 const state = {
